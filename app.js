@@ -6,6 +6,7 @@
 // Global Configuration
 const WHATSAPP_PHONE = '584144354565';
 const YOUTUBE_URL = 'https://www.youtube.com/@cristaleriaestebanpalma';
+const TIKTOK_URL = 'https://www.tiktok.com/@estebanpalma09';
 
 // Comprehensive Gallery Dataset (All paths verified on disk)
 const galleryItems = [
@@ -478,6 +479,19 @@ function updateCategoryCounts() {
   });
 }
 
+// Helper to filter directly from division links or footer
+function filterCategoryDirect(category) {
+  const btn = document.querySelector(`.filter-btn[data-filter="${category}"]`);
+  if (btn) {
+    btn.click();
+    const portfolioSection = document.getElementById('portafolio');
+    if (portfolioSection) {
+      portfolioSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  }
+}
+window.filterCategoryDirect = filterCategoryDirect;
+
 // Initialize Filter Tabs
 function initFilterTabs() {
   const filterBtns = document.querySelectorAll('.filter-btn');
@@ -489,6 +503,17 @@ function initFilterTabs() {
       displayedCount = 0;
       renderGallery();
     });
+  });
+
+  // Event delegation for category target links (e.g. hero cards, footer)
+  document.addEventListener('click', (e) => {
+    const targetLink = e.target.closest('[data-category-target]');
+    if (targetLink) {
+      const cat = targetLink.getAttribute('data-category-target');
+      if (cat) {
+        filterCategoryDirect(cat);
+      }
+    }
   });
 }
 
@@ -520,11 +545,11 @@ function renderGallery() {
 
     const isVid = item.isVideo === true;
     const mediaHTML = isVid
-      ? `<video preload="metadata" muted playsinline poster="img/IMG-20231206-WA0001.jpeg">
+      ? `<video preload="metadata" muted playsinline poster="img/IMG-20231206-WA0001.jpeg" width="400" height="260">
            <source src="${item.src}" type="video/mp4">
          </video>
          <span class="gallery-video-indicator">▶ Video</span>`
-      : `<img src="${item.src}" alt="${item.title}" loading="lazy" />`;
+      : `<img src="${item.src}" alt="${item.title}" loading="lazy" width="400" height="260" />`;
 
     card.innerHTML = `
       <div class="gallery-thumb-wrap">
@@ -695,15 +720,50 @@ function initQuoteForm() {
   const form = document.getElementById('quoteForm');
   if (!form) return;
 
+  const clientTypeRadios = document.querySelectorAll('input[name="clientType"]');
+  const b2bFields = document.getElementById('b2bFields');
+
+  if (clientTypeRadios && b2bFields) {
+    clientTypeRadios.forEach(radio => {
+      radio.addEventListener('change', () => {
+        if (radio.value === 'corporativo') {
+          b2bFields.classList.add('active');
+        } else {
+          b2bFields.classList.remove('active');
+        }
+      });
+    });
+  }
+
   form.addEventListener('submit', (e) => {
     e.preventDefault();
+    const isCorp = document.getElementById('corpRadio')?.checked;
+    const companyName = document.getElementById('quoteCompanyName')?.value.trim();
+    const rif = document.getElementById('quoteRif')?.value.trim();
     const service = document.getElementById('quoteService').value;
     const property = document.getElementById('quoteProperty').value;
     const location = document.getElementById('quoteLocation').value.trim();
     const details = document.getElementById('quoteDetails').value.trim();
     const notes = document.getElementById('quoteNotes').value.trim();
 
-    const formattedMessage = 
+    let formattedMessage = '';
+
+    if (isCorp) {
+      formattedMessage = 
+`*SOLICITUD DE COTIZACIÓN CORPORATIVA / B2B* 🏢📋
+*Esteban Palma - División Comercial e Industrial*
+---------------------------------------
+🏢 *Empresa / Razón Social:* ${companyName || 'No indicada'}
+📑 *RIF Comercial:* ${rif || 'Por confirmar'}
+🔧 *Servicio requerido:* ${service}
+🏬 *Tipo de Inmueble:* ${property}
+📍 *Ubicación / Ciudad:* ${location || 'No especificada'}
+📏 *Medidas / Cómputos:* ${details || 'Por definir con el técnico'}
+💬 *Detalles del Proyecto:* ${notes || 'Sin observaciones adicionales'}
+---------------------------------------
+_Solicitud Corporativa enviada desde el portal oficial de Esteban Palma_`;
+    } else {
+      formattedMessage = 
 `*SOLICITUD DE PRESUPUESTO EXPRESS* 📋✨
 *Esteban Palma - Soluciones Integrales*
 ---------------------------------------
@@ -714,6 +774,7 @@ function initQuoteForm() {
 💬 *Comentarios:* ${notes || 'Sin observaciones adicionales'}
 ---------------------------------------
 _Enviado desde el sitio web oficial de Esteban Palma_`;
+    }
 
     const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(formattedMessage)}`;
     window.open(url, '_blank');
@@ -744,12 +805,16 @@ function initNavigation() {
 
   if (toggle && menu) {
     toggle.addEventListener('click', () => {
-      menu.classList.toggle('open');
+      const isOpen = menu.classList.toggle('open');
+      toggle.classList.toggle('active', isOpen);
+      toggle.setAttribute('aria-expanded', String(isOpen));
     });
 
     links.forEach(link => {
       link.addEventListener('click', () => {
         menu.classList.remove('open');
+        toggle.classList.remove('active');
+        toggle.setAttribute('aria-expanded', 'false');
       });
     });
   }

@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Módulo Oficial de Presupuestos — Cristalería Esteban Palma</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/jpeg" href="assets/logo_esteban_palma.jpg" />
+  <link rel="shortcut icon" type="image/jpeg" href="assets/logo_esteban_palma.jpg" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body class="auth-locked">
+
+  <!-- ================= PANTALLA DE ACCESO / LOGIN (PROTECCIÓN) ================= -->
+  <section class="auth-gate-screen" id="authGate">
+    <div class="auth-card">
+      <div class="auth-logo-wrap">
+        <img src="assets/logo_esteban_palma.jpg" alt="Logo Oficial Esteban Palma" class="auth-logo" width="80" height="80" />
+      </div>
+
+      <div class="auth-header">
+        <span class="auth-pill">🔒 Área Exclusiva</span>
+        <h1 class="auth-title">Cristalería Esteban Palma</h1>
+        <p class="auth-subtitle">Generador Oficial de Presupuestos & Cotizaciones</p>
+      </div>
+
+      <form id="loginForm" class="auth-form" onsubmit="return false;">
+        <div class="auth-field">
+          <label for="loginUser">Usuario Autorizado</label>
+          <div class="auth-input-wrap">
+            <span class="input-icon">👤</span>
+            <input type="text" id="loginUser" autocomplete="username" placeholder="Usuario" required value="epalma" />
+          </div>
+        </div>
+
+        <div class="auth-field">
+          <label for="loginPass">Contraseña de Acceso</label>
+          <div class="auth-input-wrap">
+            <span class="input-icon">🔑</span>
+            <input type="password" id="loginPass" autocomplete="current-password" placeholder="Contraseña" required autofocus />
+          </div>
+        </div>
+
+        <div id="loginError" class="auth-alert error" style="display: none;"></div>
+
+        <button type="submit" id="btnLogin" class="btn-auth-primary">
+          <span>Ingresar al Sistema</span>
+          <span class="btn-arrow">→</span>
+        </button>
+
+        <div class="auth-footer-actions">
+          <button type="button" class="btn-link" id="btnForgotPass">
+            ¿Olvidaste o deseas restablecer tu clave?
+          </button>
+          <a href="index.html" class="btn-back-public">
+            ← Volver al sitio público
+          </a>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- ================= MODAL RESTABLECER CONTRASEÑA ================= -->
+  <div class="modal-backdrop" id="modalResetPass" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Restablecer Contraseña</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modalResetPass')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <p class="modal-desc">
+          Para restablecer tu contraseña a los valores iniciales (<strong>palma00</strong>) o definir una nueva, ingresa tu <strong>PIN Maestro de Seguridad</strong> (RIF o PIN maestro).
+        </p>
+
+        <div class="auth-field">
+          <label for="resetMasterPin">PIN Maestro de Seguridad</label>
+          <input type="password" id="resetMasterPin" class="modal-input" placeholder="Ingresa PIN maestro (ej: 06341345)" />
+        </div>
+
+        <div class="auth-field">
+          <label for="resetNewPass">Nueva Contraseña (Opcional, o dejar en blanco para palma00)</label>
+          <input type="password" id="resetNewPass" class="modal-input" placeholder="Nueva clave deseada" />
+        </div>
+
+        <div id="resetError" class="auth-alert error" style="display: none;"></div>
+        <div id="resetSuccess" class="auth-alert success" style="display: none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-secondary" onclick="closeModal('modalResetPass')">Cancelar</button>
+        <button type="button" class="btn-modal-primary" id="btnConfirmReset">Restablecer Clave</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= MODAL CAMBIAR CONTRASEÑA ================= -->
+  <div class="modal-backdrop" id="modalChangePass" style="display: none;">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Cambiar Mi Contraseña</h3>
+        <button type="button" class="modal-close" onclick="closeModal('modalChangePass')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="auth-field">
+          <label for="changeCurrentPass">Contraseña Actual</label>
+          <input type="password" id="changeCurrentPass" class="modal-input" placeholder="Clave actual" />
+        </div>
+
+        <div class="auth-field">
+          <label for="changeNewPass">Nueva Contraseña</label>
+          <input type="password" id="changeNewPass" class="modal-input" placeholder="Mínimo 6 caracteres" />
+        </div>
+
+        <div class="auth-field">
+          <label for="changeConfirmPass">Confirmar Nueva Contraseña</label>
+          <input type="password" id="changeConfirmPass" class="modal-input" placeholder="Repite la nueva clave" />
+        </div>
+
+        <div id="changeError" class="auth-alert error" style="display: none;"></div>
+        <div id="changeSuccess" class="auth-alert success" style="display: none;"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-modal-secondary" onclick="closeModal('modalChangePass')">Cancelar</button>
+        <button type="button" class="btn-modal-primary" id="btnConfirmChange">Guardar Nueva Clave</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= APLICACIÓN PRIVADA DEL COTIZADOR ================= -->
+  <div class="app-protected-wrapper" id="appProtected" style="display: none;">
+
+    <!-- Barra de Control Superior -->
+    <header class="admin-topbar no-print">
+      <div class="topbar-left">
+        <div class="app-brand-pill">
+          <img src="assets/logo_esteban_palma.jpg" alt="Logo" class="topbar-logo" />
+          <div class="topbar-titles">
+            <span class="topbar-name">CRISTALERÍA ESTEBAN PALMA</span>
+            <span class="topbar-tag">Generador Oficial de Presupuestos</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="topbar-center">
+        <!-- Switch de Vistas en Móvil -->
+        <div class="view-switcher" id="viewSwitcher">
+          <button type="button" class="switch-btn active" id="btnViewEditor" onclick="switchView('editor')">
+            📱 Modo Edición en Obra
+          </button>
+          <button type="button" class="switch-btn" id="btnViewPaper" onclick="switchView('paper')">
+            📄 Vista Documento Oficial
+          </button>
+        </div>
+      </div>
+
+      <div class="topbar-actions">
+        <div class="user-session-chip">
+          <span class="user-dot"></span>
+          <span class="user-label">epalma</span>
+        </div>
+        <button type="button" class="btn-topbar btn-sec" onclick="openModal('modalChangePass')" title="Cambiar Contraseña">
+          🔑 Clave
+        </button>
+        <button type="button" class="btn-topbar btn-danger" id="btnLogout" title="Cerrar Sesión">
+          🚪 Salir
+        </button>
+      </div>
+    </header>
+
+    <!-- Sub-Barra de Acciones Comerciales -->
+    <nav class="action-subbar no-print">
+      <div class="subbar-scroll">
+        <div class="subbar-group">
+          <button type="button" class="btn-action btn-add-m2" onclick="addNewRow('m2')" title="Agregar línea por metro cuadrado">
+            ➕ Partida por m²
+          </button>
+          <button type="button" class="btn-action btn-add-fixed" onclick="addNewRow('fixed')" title="Agregar línea con monto fijo o piezas">
+            ➕ Partida Fija ($)
+          </button>
+        </div>
+
+        <div class="subbar-group">
+          <button type="button" class="btn-action btn-template" onclick="loadTemplate('tiesto')" title="Cargar plantilla Constructora Tiesto">
+            📋 Cargar Tiesto
+          </button>
+          <button type="button" class="btn-action btn-template" onclick="loadTemplate('ventanas')" title="Cargar plantilla Refinería">
+            🪟 Cargar Ventanas
+          </button>
+          <button type="button" class="btn-action btn-template" onclick="clearTable()" title="Presupuesto en blanco">
+            📄 En Blanco
+          </button>
+        </div>
+
+        <div class="subbar-group">
+          <button type="button" class="btn-action btn-save" onclick="saveToStorage()" title="Guardar borrador en el teléfono">
+            💾 Guardar Borrador
+          </button>
+          <button type="button" class="btn-action btn-whatsapp-share" onclick="shareViaWhatsApp()" title="Compartir desglose formal por WhatsApp">
+            💬 Enviar a WhatsApp
+          </button>
+          <button type="button" class="btn-action btn-print-pdf" onclick="window.print()" title="Imprimir o guardar en PDF limpio tamaño Carta">
+            🖨️ Imprimir / PDF
+          </button>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Contenedor Principal -->
+    <main class="app-main-content">
+
+      <!-- VISTA 1: MODO EDICIÓN EN OBRA (CARDS APILABLES RESPONSIVAS PARA CELULAR) -->
+      <section class="mobile-editor-section" id="mobileEditorView">
+        
+        <!-- Ficha Rápida del Cliente en Móvil -->
+        <div class="mobile-card-panel client-quick-panel">
+          <div class="panel-header">
+            <h3>📋 Datos del Cliente y Obra</h3>
+            <span class="badge-status">Cotización en Curso</span>
+          </div>
+
+          <div class="mobile-form-grid">
+            <div class="m-field">
+              <label>Cliente / Razón Social:</label>
+              <input type="text" id="mClientName" class="m-input" placeholder="Ej: Constructora Tiesto" oninput="syncFromMobileInputs()" />
+            </div>
+            <div class="m-field">
+              <label>Ubicación de la Obra:</label>
+              <input type="text" id="mClientLocation" class="m-input" placeholder="Ej: Valencia, Edo. Carabobo" oninput="syncFromMobileInputs()" />
+            </div>
+            <div class="m-field">
+              <label>Atención / Contacto:</label>
+              <input type="text" id="mClientAttention" class="m-input" placeholder="Ej: Gerencia de Obras" oninput="syncFromMobileInputs()" />
+            </div>
+            <div class="m-field">
+              <label>Objeto del Presupuesto:</label>
+              <input type="text" id="mClientSubject" class="m-input" placeholder="Ej: Cristalería y Drywall" oninput="syncFromMobileInputs()" />
+            </div>
+            <div class="m-field-row">
+              <div class="m-field">
+                <label>N° Cotización:</label>
+                <input type="text" id="mQuoteNumber" class="m-input" oninput="syncFromMobileInputs()" />
+              </div>
+              <div class="m-field">
+                <label>Fecha:</label>
+                <input type="text" id="mQuoteDate" class="m-input" oninput="syncFromMobileInputs()" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Lista de Tarjetas de Partidas en Móvil -->
+        <div class="mobile-items-container">
+          <div class="panel-header-sticky">
+            <h3>🔨 Partidas y Servicios (<span id="mItemsCount">0</span>)</h3>
+            <div class="header-btns">
+              <button type="button" class="btn-pill-add m2" onclick="addNewRow('m2')">➕ m²</button>
+              <button type="button" class="btn-pill-add fixed" onclick="addNewRow('fixed')">➕ Fija</button>
+            </div>
+          </div>
+
+          <div id="mobileCardsList" class="mobile-cards-stack">
+            <!-- Dynamic Mobile Cards injected here -->
+          </div>
+        </div>
+
+        <!-- Totales Flotantes en Móvil -->
+        <div class="mobile-totals-panel">
+          <div class="m-totals-summary">
+            <div class="m-total-item">
+              <span>Subtotal Partidas Fijas:</span>
+              <strong id="mValSubtotalFijo">$0,00 USD</strong>
+            </div>
+            <div class="m-total-item">
+              <span>Anticipo Inicial (60%):</span>
+              <strong class="highlight-accent" id="mValAnticipo">$0,00 USD</strong>
+            </div>
+            <div class="m-total-item major">
+              <span>TOTAL GENERAL FIJO:</span>
+              <strong class="highlight-primary" id="mValTotalFijo">$0,00 USD</strong>
+            </div>
+            <div class="m-totals-note" id="mTotalNote">
+              + Partidas por m² según metraje final en obra
+            </div>
+          </div>
+
+          <div class="m-bottom-actions">
+            <button type="button" class="m-btn-share-wa" onclick="shareViaWhatsApp()">
+              💬 Enviar Presupuesto a WhatsApp
+            </button>
+            <button type="button" class="m-btn-pdf" onclick="window.print()">
+              🖨️ Ver / Descargar PDF
+            </button>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- VISTA 2: HOJA DOCUMENTAL OFICIAL TAMAÑO CARTA (PRINT & DESKTOP) -->
+      <section class="paper-preview-section" id="paperPreviewView">
+        <div class="paper-page-container">
+          
+          <article class="budget-official-sheet" id="budgetOfficialSheet">
+            <div class="sheet-top-accent"></div>
+
+            <!-- ENCABEZADO INSTITUCIONAL OFICIAL -->
+            <header class="sheet-header">
+              <div class="sheet-logo-box">
+                <img src="assets/logo_esteban_palma.jpg" alt="Logo Cristalería Esteban Palma" class="sheet-logo-img" />
+              </div>
+              <div class="sheet-company-details">
+                <h1 class="sheet-company-name" contenteditable="true" id="companyName">CRISTALERÍA ESTEBAN PALMA</h1>
+                <p class="sheet-company-tagline" contenteditable="true" id="companyTagline">Cristalería Arquitectónica • Drywall • Revestimientos & Acabados</p>
+                <div class="sheet-company-meta">
+                  <div><strong>RIF:</strong> <span contenteditable="true">V-06341345-0</span> &nbsp;|&nbsp; <strong>Representante:</strong> <span contenteditable="true">Esteban Enrique Palma Trujillo</span></div>
+                  <div><strong>Dirección:</strong> <span contenteditable="true">Sector El Rosario II, Av. Michelena N° 8, Local N° 2 — Güigüe, Edo. Carabobo</span></div>
+                  <div><strong>Teléfonos:</strong> <span contenteditable="true">0412-887.83.91 / 0412-660.23.76</span> &nbsp;|&nbsp; <strong>WhatsApp:</strong> <span contenteditable="true">+58 414-435.45.65</span></div>
+                </div>
+              </div>
+
+              <div class="sheet-quote-badge">
+                <div class="badge-title">PRESUPUESTO</div>
+                <div class="badge-row"><span>N° Cotización:</span> <strong contenteditable="true" id="quoteNumber">COT-2026-1027</strong></div>
+                <div class="badge-row"><span>Fecha:</span> <strong contenteditable="true" id="quoteDate">12/11/2026</strong></div>
+                <div class="badge-row"><span>Validez:</span> <strong contenteditable="true">15 Días</strong></div>
+                <div class="badge-row"><span>Moneda:</span> <strong>Dólares ($ USD)</strong></div>
+              </div>
+            </header>
+
+            <!-- FICHA DEL CLIENTE -->
+            <section class="sheet-client-card">
+              <div class="client-box">
+                <span class="c-label">Cliente / Razón Social:</span>
+                <span class="c-val strong" contenteditable="true" id="clientName">Constructora Tiesto</span>
+              </div>
+              <div class="client-box">
+                <span class="c-label">Ubicación de la Obra:</span>
+                <span class="c-val" contenteditable="true" id="clientLocation">Valencia, Edo. Carabobo, Venezuela</span>
+              </div>
+              <div class="client-box">
+                <span class="c-label">Atención / Departamento:</span>
+                <span class="c-val" contenteditable="true" id="clientAttention">Gerencia de Proyectos & Obras</span>
+              </div>
+              <div class="client-box">
+                <span class="c-label">Objeto del Presupuesto:</span>
+                <span class="c-val" contenteditable="true" id="clientSubject">Desmontaje, Playcem, Drywall, Pintura, Empastado, PVC y Wall Panel</span>
+              </div>
+            </section>
+
+            <!-- SECCIÓN DETALLE DE PARTIDAS -->
+            <section class="sheet-items-section">
+              <div class="items-header-bar">
+                <span class="bar-title">Detalle de Servicios y Suministros</span>
+                <span class="bar-note">Precios expresados en Dólares ($ USD)</span>
+              </div>
+
+              <table class="official-table" id="officialItemsTable">
+                <thead>
+                  <tr>
+                    <th style="width: 105px;" class="col-center">Cantidad / Medida</th>
+                    <th>Concepto o Descripción Técnica del Servicio</th>
+                    <th style="width: 110px;" class="col-right">P. Unitario ($ USD)</th>
+                    <th style="width: 110px;" class="col-right">Total ($ USD)</th>
+                    <th style="width: 70px;" class="col-center no-print">Acción</th>
+                  </tr>
+                </thead>
+                <tbody id="officialItemsBody">
+                  <!-- Dynamic rows injected here -->
+                </tbody>
+              </table>
+            </section>
+
+            <!-- RESUMEN FINANCIERO Y NOTA DE MEDICIÓN -->
+            <section class="sheet-financial-grid">
+              <div class="financial-note-box">
+                <strong>📌 NOTA DE CUBICACIÓN Y FACTURACIÓN:</strong>
+                <p contenteditable="true" id="notesText">
+                  Los servicios especificados <em>"Por m²"</em> corresponden a tarifas unitarias fijas de mano de obra especializada. La facturación final de estos conceptos se liquidará de acuerdo al área real ejecutada y medida en obra de común acuerdo entre las partes.
+                </p>
+              </div>
+
+              <div class="financial-totals-box">
+                <div class="f-row">
+                  <span id="labelPartidasFijas">Subtotal Partidas Fijas:</span>
+                  <strong id="valSubtotalFijo">$660,00 USD</strong>
+                </div>
+                <div class="f-row">
+                  <span id="labelAnticipo">Anticipo (60%):</span>
+                  <strong style="color: #0284c7;" id="valAnticipo">$396,00 USD</strong>
+                </div>
+                <div class="f-row major">
+                  <span>TOTAL GENERAL FIJO:</span>
+                  <strong style="color: #0a2540;" id="valTotalFijo">$660,00 USD</strong>
+                </div>
+                <div class="f-currency-note" contenteditable="true" id="totalNote">
+                  + Partidas por m² según metraje final en obra
+                </div>
+              </div>
+            </section>
+
+            <!-- CONDICIONES COMERCIALES (SIN MENCIÓN DE 12 MESES) -->
+            <section class="sheet-conditions-container">
+              <div class="conditions-title">
+                Términos Comerciales & Estándares de Ejecución
+              </div>
+              <div class="conditions-grid" id="conditionsList">
+                <div class="condition-item">
+                  <strong>• Moneda Oficial:</strong> <span contenteditable="true">Todos los montos se encuentran expresados únicamente en <strong>Dólares Americanos ($ USD)</strong>.</span>
+                </div>
+                <div class="condition-item">
+                  <strong>• Forma de Pago:</strong> <span contenteditable="true">60% de anticipo para inicio de labores; saldo restante por valuaciones semanales o al culminar los trabajos.</span>
+                </div>
+                <div class="condition-item">
+                  <strong>• Personal Calificado:</strong> <span contenteditable="true">Técnicos especialistas con amplia experiencia en cristalería arquitectónica, drywall y sistemas CCTV.</span>
+                </div>
+                <div class="condition-item">
+                  <strong>• Estándares de Calidad:</strong> <span contenteditable="true">Instalación y montaje bajo rigurosos estándares técnicos de aplomado, nivelación y fijación estructural.</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- FIRMAS OFICIALES -->
+            <footer class="sheet-signatures-area">
+              <div class="sig-col">
+                <div class="sig-line"></div>
+                <div class="sig-name" contenteditable="true">Esteban Enrique Palma Trujillo</div>
+                <div class="sig-role">Gerente — Cristalería Esteban Palma<br/>C.I. / RIF: V-06341345-0</div>
+              </div>
+              <div class="sig-col">
+                <div class="sig-line"></div>
+                <div class="sig-name" contenteditable="true">Aceptación del Cliente</div>
+                <div class="sig-role" contenteditable="true">Firma Autorizada / Sello de la Empresa<br/>Fecha: _____ / _____ / 2026</div>
+              </div>
+            </footer>
+
+            <!-- PIE DE HOJA -->
+            <div class="sheet-page-footer">
+              <span contenteditable="true">Cristalería Esteban Palma • Güigüe, Edo. Carabobo • Contacto: 0412-887.83.91 / 0414-435.45.65</span>
+              <span contenteditable="true">Presupuesto Oficial • Validez: 15 Días</span>
+            </div>
+
+          </article>
+
+        </div>
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- SCRIPT DE LÓGICA Y SEGURIDAD CRIPTOGRÁFICA -->
+  <script src="admin.js"></script>
+</body>
+</html>
