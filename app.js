@@ -683,6 +683,7 @@ function openLightbox(index) {
   badgeElem.textContent = item.badge + ' • ' + item.categoryLabel;
 
   modal.classList.add('active');
+  modal.setAttribute('aria-hidden', 'false');
   document.body.style.overflow = 'hidden';
 }
 
@@ -696,6 +697,7 @@ function closeLightbox() {
   if (video) video.pause();
 
   modal.classList.remove('active');
+  modal.setAttribute('aria-hidden', 'true');
   document.body.style.overflow = '';
   currentLightboxIndex = -1;
 }
@@ -709,10 +711,24 @@ function navigateLightbox(direction) {
 }
 
 // Open WhatsApp with pre-filled quote template
+function openExternalWhatsApp(message) {
+  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
+  const popup = window.open(url, '_blank', 'noopener,noreferrer');
+  if (!popup) {
+    window.location.href = url;
+  }
+}
+
 function openWhatsAppQuote(title, category) {
   const message = `Hola Esteban Palma! 👋\n\nEstuve revisando su sitio web y me interesa solicitar un presupuesto formal para un trabajo similar a:\n\n📌 *Proyecto:* ${title}\n📂 *Categoría:* ${category}\n\n¿Podrían indicarme qué datos o medidas necesitan para cotizarme? Muchas gracias!`;
-  const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(message)}`;
-  window.open(url, '_blank');
+  openExternalWhatsApp(message);
+}
+
+function setFieldValidation(input, errorEl, message) {
+  if (!input) return;
+  input.classList.toggle('input-error', Boolean(message));
+  input.setAttribute('aria-invalid', message ? 'true' : 'false');
+  if (errorEl) errorEl.textContent = message || '';
 }
 
 // Quote Form (Presupuesto Express)
@@ -722,6 +738,17 @@ function initQuoteForm() {
 
   const clientTypeRadios = document.querySelectorAll('input[name="clientType"]');
   const b2bFields = document.getElementById('b2bFields');
+  const companyInput = document.getElementById('quoteCompanyName');
+  const companyError = document.getElementById('quoteCompanyError');
+  const locationInput = document.getElementById('quoteLocation');
+  const locationError = document.getElementById('quoteLocationError');
+
+  if (companyInput) {
+    companyInput.addEventListener('input', () => setFieldValidation(companyInput, companyError, ''));
+  }
+  if (locationInput) {
+    locationInput.addEventListener('input', () => setFieldValidation(locationInput, locationError, ''));
+  }
 
   if (clientTypeRadios && b2bFields) {
     clientTypeRadios.forEach(radio => {
@@ -730,6 +757,7 @@ function initQuoteForm() {
           b2bFields.classList.add('active');
         } else {
           b2bFields.classList.remove('active');
+          setFieldValidation(companyInput, companyError, '');
         }
       });
     });
@@ -738,13 +766,34 @@ function initQuoteForm() {
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const isCorp = document.getElementById('corpRadio')?.checked;
-    const companyName = document.getElementById('quoteCompanyName')?.value.trim();
+    const companyName = companyInput ? companyInput.value.trim() : '';
     const rif = document.getElementById('quoteRif')?.value.trim();
     const service = document.getElementById('quoteService').value;
     const property = document.getElementById('quoteProperty').value;
-    const location = document.getElementById('quoteLocation').value.trim();
+    const location = locationInput ? locationInput.value.trim() : '';
     const details = document.getElementById('quoteDetails').value.trim();
     const notes = document.getElementById('quoteNotes').value.trim();
+
+    let firstInvalid = null;
+
+    if (isCorp && !companyName) {
+      setFieldValidation(companyInput, companyError, 'Ingresa el nombre de la empresa o razón social.');
+      firstInvalid = firstInvalid || companyInput;
+    } else {
+      setFieldValidation(companyInput, companyError, '');
+    }
+
+    if (!location) {
+      setFieldValidation(locationInput, locationError, 'Indica la ciudad o zona donde se realizará el trabajo.');
+      firstInvalid = firstInvalid || locationInput;
+    } else {
+      setFieldValidation(locationInput, locationError, '');
+    }
+
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return;
+    }
 
     let formattedMessage = '';
 
@@ -776,22 +825,33 @@ _Solicitud Corporativa enviada desde el portal oficial de Esteban Palma_`;
 _Enviado desde el sitio web oficial de Esteban Palma_`;
     }
 
-    const url = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(formattedMessage)}`;
-    window.open(url, '_blank');
+    openExternalWhatsApp(formattedMessage);
   });
 }
 
 // FAQ Accordion
 function initFAQ() {
   const faqItems = document.querySelectorAll('.faq-item');
+  const toggleItem = (item) => {
+    const isOpen = item.classList.contains('open');
+    faqItems.forEach(i => {
+      i.classList.remove('open');
+      i.querySelector('.faq-header')?.setAttribute('aria-expanded', 'false');
+    });
+    if (!isOpen) {
+      item.classList.add('open');
+      item.querySelector('.faq-header')?.setAttribute('aria-expanded', 'true');
+    }
+  };
+
   faqItems.forEach(item => {
     const header = item.querySelector('.faq-header');
     if (!header) return;
-    header.addEventListener('click', () => {
-      const isOpen = item.classList.contains('open');
-      faqItems.forEach(i => i.classList.remove('open'));
-      if (!isOpen) {
-        item.classList.add('open');
+    header.addEventListener('click', () => toggleItem(item));
+    header.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleItem(item);
       }
     });
   });
@@ -803,41 +863,65 @@ function initNavigation() {
   const menu = document.getElementById('navMenu');
   const links = document.querySelectorAll('.nav-link');
 
+  const setMenuOpen = (isOpen) => {
+    if (!menu || !toggle) return;
+    menu.classList.toggle('open', isOpen);
+    toggle.classList.toggle('active', isOpen);
+    toggle.setAttribute('aria-expanded', String(isOpen));
+  };
+
   if (toggle && menu) {
-    toggle.addEventListener('click', () => {
-      const isOpen = menu.classList.toggle('open');
-      toggle.classList.toggle('active', isOpen);
-      toggle.setAttribute('aria-expanded', String(isOpen));
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setMenuOpen(!menu.classList.contains('open'));
     });
 
     links.forEach(link => {
-      link.addEventListener('click', () => {
-        menu.classList.remove('open');
-        toggle.classList.remove('active');
-        toggle.setAttribute('aria-expanded', 'false');
-      });
+      link.addEventListener('click', () => setMenuOpen(false));
+    });
+
+    document.addEventListener('click', (e) => {
+      if (menu.classList.contains('open') && !menu.contains(e.target) && !toggle.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && menu.classList.contains('open')) {
+        setMenuOpen(false);
+        toggle.focus();
+      }
     });
   }
 
-  // Active section spy on scroll
-  const sections = document.querySelectorAll('section[id]');
-  window.addEventListener('scroll', () => {
-    const scrollY = window.pageYOffset;
-    sections.forEach(section => {
-      const sectionHeight = section.offsetHeight;
-      const sectionTop = section.offsetTop - 120;
-      const sectionId = section.getAttribute('id');
-      const navLink = document.querySelector(`.nav-link[href="#${sectionId}"]`);
+  // Active section spy on scroll (includes #divisiones nested inside #inicio)
+  const navTargets = Array.from(links)
+    .map(link => {
+      const id = link.getAttribute('href')?.replace(/^#/, '');
+      const el = id ? document.getElementById(id) : null;
+      return el ? { el, link } : null;
+    })
+    .filter(Boolean);
 
-      if (navLink) {
-        if (scrollY > sectionTop && scrollY <= sectionTop + sectionHeight) {
-          navLink.classList.add('active');
-        } else {
-          navLink.classList.remove('active');
-        }
+  const updateActiveLink = () => {
+    if (!navTargets.length) return;
+    const cursorY = window.scrollY + 120;
+    let activeEntry = navTargets[0];
+
+    navTargets.forEach(entry => {
+      const topY = entry.el.getBoundingClientRect().top + window.scrollY;
+      if (cursorY >= topY) {
+        activeEntry = entry;
       }
     });
-  });
+
+    navTargets.forEach(entry => {
+      entry.link.classList.toggle('active', entry === activeEntry);
+    });
+  };
+
+  window.addEventListener('scroll', updateActiveLink, { passive: true });
+  updateActiveLink();
 }
 
 // Back to Top button
@@ -846,12 +930,12 @@ function initBackToTop() {
   if (!btn) return;
 
   window.addEventListener('scroll', () => {
-    if (window.pageYOffset > 450) {
+    if (window.scrollY > 450) {
       btn.classList.add('visible');
     } else {
       btn.classList.remove('visible');
     }
-  });
+  }, { passive: true });
 
   btn.addEventListener('click', () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });

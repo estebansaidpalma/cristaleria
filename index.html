@@ -126,7 +126,7 @@
           <!-- Division 1: Cristalería & Drywall -->
           <div class="division-hero-card">
             <div class="division-card-img-wrap">
-              <img src="assets/hero_cristaleria.jpg" alt="Cristalería y Drywall Esteban Palma" loading="lazy" width="600" height="340" />
+              <img src="assets/hero_cristaleria.jpg" alt="Cristalería y Drywall Esteban Palma" width="600" height="340" decoding="async" />
               <div class="division-img-overlay"></div>
               <span class="division-pill">💎 Cristalería & Drywall</span>
             </div>
@@ -151,7 +151,7 @@
           <!-- Division 2: Cámaras de Seguridad -->
           <div class="division-hero-card">
             <div class="division-card-img-wrap">
-              <img src="assets/hero_camaras.jpg" alt="Cámaras de Seguridad Esteban Palma" loading="lazy" width="600" height="340" />
+              <img src="assets/hero_camaras.jpg" alt="Cámaras de Seguridad Esteban Palma" width="600" height="340" decoding="async" />
               <div class="division-img-overlay"></div>
               <span class="division-pill">📹 Seguridad Electrónica</span>
             </div>
@@ -664,7 +664,7 @@
           </p>
         </div>
 
-        <form id="quoteForm">
+        <form id="quoteForm" novalidate>
           <div class="quote-form-grid">
 
             <!-- Client Type Radio Selector -->
@@ -687,6 +687,7 @@
               <div class="form-group">
                 <label for="quoteCompanyName" class="form-label">Nombre de la Empresa / Razón Social:</label>
                 <input type="text" id="quoteCompanyName" class="form-control" placeholder="Ej: Farmacia San Juan, C.A. / Inversiones 2026" />
+                <span class="form-error-msg" id="quoteCompanyError" aria-live="polite"></span>
               </div>
               <div class="form-group">
                 <label for="quoteRif" class="form-label">RIF Comercial (Opcional):</label>
@@ -721,6 +722,7 @@
             <div class="form-group">
               <label for="quoteLocation" class="form-label">Ciudad o Zona de trabajo:</label>
               <input type="text" id="quoteLocation" class="form-control" placeholder="Ej: Valencia, Naguanagua, San Diego, Maracay..." required />
+              <span class="form-error-msg" id="quoteLocationError" aria-live="polite"></span>
             </div>
 
             <div class="form-group">
@@ -761,7 +763,7 @@
       <div class="faq-list">
         
         <div class="faq-item">
-          <div class="faq-header">
+          <div class="faq-header" role="button" tabindex="0" aria-expanded="false">
             <h4>¿Cómo solicito un presupuesto y cuál es el tiempo de respuesta?</h4>
             <span class="faq-icon">▼</span>
           </div>
@@ -773,7 +775,7 @@
         </div>
 
         <div class="faq-item">
-          <div class="faq-header">
+          <div class="faq-header" role="button" tabindex="0" aria-expanded="false">
             <h4>¿Puedo ver las cámaras de seguridad en mi celular desde cualquier país?</h4>
             <span class="faq-icon">▼</span>
           </div>
@@ -785,7 +787,7 @@
         </div>
 
         <div class="faq-item">
-          <div class="faq-header">
+          <div class="faq-header" role="button" tabindex="0" aria-expanded="false">
             <h4>¿Qué grosor de vidrio se utiliza para puertas de baño y fachadas?</h4>
             <span class="faq-icon">▼</span>
           </div>
@@ -797,7 +799,7 @@
         </div>
 
         <div class="faq-item">
-          <div class="faq-header">
+          <div class="faq-header" role="button" tabindex="0" aria-expanded="false">
             <h4>¿El drywall es resistente y soporta iluminación empotrada?</h4>
             <span class="faq-icon">▼</span>
           </div>
@@ -809,7 +811,7 @@
         </div>
 
         <div class="faq-item">
-          <div class="faq-header">
+          <div class="faq-header" role="button" tabindex="0" aria-expanded="false">
             <h4>¿Realizan trabajos fuera de Valencia y en otros estados?</h4>
             <span class="faq-icon">▼</span>
           </div>
@@ -821,7 +823,7 @@
         </div>
 
         <div class="faq-item">
-          <div class="faq-header">
+          <div class="faq-header" role="button" tabindex="0" aria-expanded="false">
             <h4>¿Qué garantía ofrecen en sus trabajos?</h4>
             <span class="faq-icon">▼</span>
           </div>
@@ -943,7 +945,7 @@
         <div class="footer-brand">
           <div class="brand-logo">
             <div class="logo-icon">
-              <img src="assets/logo_esteban_palma.jpg" alt="Logo Oficial Esteban Palma" class="brand-logo-img" />
+              <img src="assets/logo_esteban_palma.jpg" alt="Logo Oficial Esteban Palma" class="brand-logo-img" width="46" height="46" loading="lazy" decoding="async" />
             </div>
             <div class="brand-text">
               <span class="brand-title">ESTEBAN PALMA</span>
